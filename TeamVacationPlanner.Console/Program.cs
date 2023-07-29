@@ -76,11 +76,15 @@ public class Program
 
         // Run API
         var espnApi = new ESPNApi();
-        var (Events, Error) = await espnApi.GetOverlappingEvents(numberOfDays, favoriteTeams);
+        var (Events, Errors) = await espnApi.GetOverlappingEvents(numberOfDays, favoriteTeams);
 
-        if (!string.IsNullOrWhiteSpace(Error))
+        if (Errors.Any())
         {
-            Console.WriteLine(Error);
+            Console.WriteLine();
+            foreach (var error in Errors)
+            {
+                Console.WriteLine(error);
+            }
         }
         else
         {

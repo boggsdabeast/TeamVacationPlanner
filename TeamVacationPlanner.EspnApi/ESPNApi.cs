@@ -48,7 +48,7 @@ namespace TeamVacationPlanner.EspnApi
             });
         }
 
-        public async Task<(List<SportsEvent> Events, string Error)> GetOverlappingEvents(int numberOfDays, Dictionary<string, string> favoriteTeams)
+        public async Task<(List<SportsEvent> Events, List<string> Errors)> GetOverlappingEvents(int numberOfDays, Dictionary<string, string> favoriteTeams)
         {
             try
             {
@@ -152,11 +152,21 @@ namespace TeamVacationPlanner.EspnApi
                     }
                 }
 
-                return (items.Distinct().OrderBy(x => x.DateTimeA).ToList(), null);
+                return (items.Distinct().OrderBy(x => x.DateTimeA).ToList(), new List<string>());
             }
             catch (Exception ex)
             {
-                return (new List<SportsEvent>(), $"Please re-enter data in proper format to get valid results.{Environment.NewLine}{ex.Message}");
+                var errorMessage = new List<string>() { "Please re-enter data in proper format to get valid results." };
+#if DEBUG
+                if (!string.IsNullOrWhiteSpace(ex.Message))
+                    errorMessage.Add(ex.Message);
+                if (ex.InnerException != null)
+                    errorMessage.Add(ex.InnerException.ToString());
+                if (!string.IsNullOrWhiteSpace(ex.StackTrace))
+                    errorMessage.Add(ex.StackTrace);
+#endif
+
+                return (new List<SportsEvent>(), errorMessage);
             }
         }
     }

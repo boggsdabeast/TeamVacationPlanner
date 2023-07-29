@@ -3,7 +3,7 @@
     ViewData["Title"] = "Home page";
 }
 
-<h1>Select Teams</h1>
+<h2>Select Teams</h2>
 <form method="post">
     <div class="form-container">
         <label class="right-padding" for="selectedSport">Select a sport:</label>
@@ -15,13 +15,18 @@
             }
         </select>
 
-        <label for="numberOfDays"># of days:</label>
-        <input type="number" id="numberOfDays" name="numberOfDays" asp-for="NumberOfDays" />
+        <label class="right-padding" for="numberOfDays"># of days:</label>
+        <input class="right-padding" type="number" id="numberOfDays" name="numberOfDays" asp-for="NumberOfDays" />
 
-        <label class="right-padding" for="favoriteTeam">Enter favorite teams abbreviation:</label>
+        <label class="right-padding" for="favoriteTeam">Enter favorite teams abbreviation (ex: MIN):</label>
         <input class="right-padding" type="text" id="favoriteTeam" name="FavoriteTeam" asp-for="FavoriteTeam" />
 
-        <button type="submit">Add</button>
+        <input class="right-padding" type="submit" value="Add" />
+
+        @if (Model.FavoriteTeams.Any() && !Model.Errors.Any())
+        {
+            <input type="button" value="Reset" onclick="location.href='@Url.Action("Reset", "Home")'" />
+        }
     </div>
 </form>
 
@@ -29,6 +34,22 @@
 
 @if (Model.FavoriteTeams.Any())
 {
+    if (Model.Errors.Any())
+    {
+        foreach (var error in Model.Errors)
+        {
+            <span style="font-weight: bold">@error</span>
+            <br />
+        }
+        <br />
+    }
+
+    if (Model.Events.Count == 0 && !Model.Errors.Any())
+    {
+        <h1 style="text-decoration: underline; color: yellow; background-color: black; padding: 10px; text-align: center">It is reccomended to add additional sports</h1>
+        <br />
+    }
+
     <table>
         <tr>
             <th>Sport</th>

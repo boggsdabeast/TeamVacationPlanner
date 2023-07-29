@@ -40,9 +40,12 @@ namespace TeamVacationPlanner.Mvc.Controllers
 
             if (model.FavoriteTeams.Any())
             {
-                var (Events, Error) = await _espnApi.GetOverlappingEvents(model.NumberOfDays, model.FavoriteTeams);
-                if (!string.IsNullOrWhiteSpace(Error))
-                    model.Errors = Error;
+                var (Events, Errors) = await _espnApi.GetOverlappingEvents(model.NumberOfDays, model.FavoriteTeams);
+                if (Errors.Any())
+                {
+                    model.Errors = Errors;
+                    SaveFavoriteTeamsToSession(new FavoriteTeamModelBase());
+                }
 
                 model.Events.AddRange(Events);
             }
@@ -53,6 +56,23 @@ namespace TeamVacationPlanner.Mvc.Controllers
         [HttpPost]
         public IActionResult Index(FavoriteTeamModel model)
         {
+            if (model.FavoriteTeam?.ToLowerInvariant()?.Trim() == "colan")
+            {
+                SaveFavoriteTeamsToSession(new FavoriteTeamModelBase()
+                {
+                    NumberOfDays = model.NumberOfDays,
+                    FavoriteTeams = new Dictionary<string, string>
+                    {
+                        { "NFL", "DEN" },
+                        { "MLB", "MIN" },
+                        { "NBA", "MIN" },
+                        { "NHL", "MIN" },
+                        { "MLS", "MIN" }
+                    }
+                });
+                return RedirectToAction("Index");
+            }
+
             if (ModelState.IsValid)
             {
                 var hasChanges = false;
@@ -62,16 +82,7 @@ namespace TeamVacationPlanner.Mvc.Controllers
                     data.NumberOfDays = model.NumberOfDays;
                     hasChanges = true;
                 }
-                if (model.FavoriteTeam.ToLowerInvariant() == "colan")
-                {
-                    data.FavoriteTeams.Add("NFL", "DEN");
-                    data.FavoriteTeams.Add("MLB", "MIN");
-                    data.FavoriteTeams.Add("NBA", "MIN");
-                    data.FavoriteTeams.Add("NHL", "MIN");
-                    data.FavoriteTeams.Add("MLS", "MIN");
-                    hasChanges = true;
-                }
-                else if (!data.FavoriteTeams.ContainsKey(model.SelectedSportId) || !data.FavoriteTeams.ContainsValue(model.FavoriteTeam))
+                if (!data.FavoriteTeams.ContainsKey(model.SelectedSportId) || !data.FavoriteTeams.ContainsValue(model.FavoriteTeam))
                 {
                     data.FavoriteTeams[model.SelectedSportId] = model.FavoriteTeam;
                     hasChanges = true;
@@ -81,6 +92,12 @@ namespace TeamVacationPlanner.Mvc.Controllers
                     SaveFavoriteTeamsToSession(data);
             }
 
+            return RedirectToAction("Index");
+        }
+
+        public IActionResult Reset()
+        {
+            SaveFavoriteTeamsToSession(new FavoriteTeamModelBase());
             return RedirectToAction("Index");
         }
 

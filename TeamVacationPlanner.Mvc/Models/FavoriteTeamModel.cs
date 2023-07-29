@@ -14,6 +14,6 @@ namespace TeamVacationPlanner.Mvc.Models
         public string FavoriteTeam { get; set; }
         public List<SportData> Sports { get; set; } = new();
         public List<SportsEvent> Events { get; set; } = new();
-        public string Errors = string.Empty;        
+        public List<string> Errors = new();
     }
 }
