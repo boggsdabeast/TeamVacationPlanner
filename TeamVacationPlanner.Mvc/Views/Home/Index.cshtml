@@ -1,0 +1,74 @@
+﻿@model FavoriteTeamModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<h1>Select Teams</h1>
+<form method="post">
+    <div class="form-container">
+        <label class="right-padding" for="selectedSport">Select a sport:</label>
+        <select class="right-padding" id="selectedSport" name="SelectedSportId" asp-for="SelectedSportId">
+            <option value="">Select a supported sport</option>
+            @foreach (var sport in Model.Sports)
+            {
+                <option value="@sport.Id">@sport.Name</option>
+            }
+        </select>
+
+        <label for="numberOfDays"># of days:</label>
+        <input type="number" id="numberOfDays" name="numberOfDays" asp-for="NumberOfDays" />
+
+        <label class="right-padding" for="favoriteTeam">Enter favorite teams abbreviation:</label>
+        <input class="right-padding" type="text" id="favoriteTeam" name="FavoriteTeam" asp-for="FavoriteTeam" />
+
+        <button type="submit">Add</button>
+    </div>
+</form>
+
+<br />
+
+@if (Model.FavoriteTeams.Any())
+{
+    <table>
+        <tr>
+            <th>Sport</th>
+            <th>Favorite Team</th>
+        </tr>
+        @foreach (var item in Model.FavoriteTeams)
+        {
+            <tr>
+                <td>@Model.Sports.Find(s => s.Id == item.Key)?.Name</td>
+                <td>@item.Value</td>
+            </tr>
+        }
+    </table>
+
+    <br />
+}
+
+@if (Model.Events.Any())
+{
+    <span>Count: </span> @Model.Events.Count
+    <br />
+    <table>
+        <tr>
+            <th>Competition A</th>
+            <th>Competition B</th>
+            <th>Location A</th>
+            <th>Location B</th>
+            <th>Date A</th>
+            <th>Date B</th>
+        </tr>
+        @foreach (var item in Model.Events)
+        {
+            <tr>
+                <td>@item.CompetitionA</td>
+                <td>@item.CompetitionB</td>
+                <td>@item.LocationA</td>
+                <td>@item.LocationB</td>
+                <td>@item.DateTimeA</td>
+                <td>@item.DateTimeB</td>
+            </tr>
+        }
+    </table>
+}
