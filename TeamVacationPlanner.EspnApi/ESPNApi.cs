@@ -1,4 +1,7 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
+using Newtonsoft.Json;
 
 namespace TeamVacationPlanner.EspnApi
 {
@@ -7,6 +10,7 @@ namespace TeamVacationPlanner.EspnApi
         private const string ApiBaseUrl = "https://site.api.espn.com/apis/site/v2/sports";
         private readonly HttpClient _httpClient;
         private readonly List<Event> _hardcodedEvents = new();
+        private string _apiKey;
 
         public ESPNApi()
         {
@@ -46,6 +50,17 @@ namespace TeamVacationPlanner.EspnApi
                 Name = "MNUFC @ KC",
                 Competitions = new List<Competition> { new Competition() { Venue = new Venue() { FullName = "Children's Mercy Park", Address = new Address() { State = "KC" } } } }
             });
+
+            var host = new HostBuilder()
+            .ConfigureAppConfiguration((hostContext, config) =>
+            {
+                config.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+            })
+            .Build();
+
+            var configuration = host.Services.GetRequiredService<IConfiguration>();
+
+            _apiKey = configuration["ApiKeys:BingMaps"];
         }
 
         public async Task<(List<SportsEvent> Events, List<string> Errors)> GetOverlappingEvents(int numberOfDays, Dictionary<string, string> favoriteTeams)
@@ -60,7 +75,7 @@ namespace TeamVacationPlanner.EspnApi
 
                 foreach (var item in favoriteTeams)
                 {
-                    switch (item.Key.TrimEnd().ToUpperInvariant())
+                    switch (item.Key.Trim().ToUpperInvariant())
                     {
                         case "MLB":
                             url = $"{ApiBaseUrl}/baseball/mlb/teams";
@@ -86,7 +101,7 @@ namespace TeamVacationPlanner.EspnApi
                     {
                         var json = await response.Content.ReadAsStringAsync();
                         var result = JsonConvert.DeserializeObject<ESPNApiResponse>(json);
-                        favTeamId = result.Sports.First().Leagues.Select(x => x.Teams).First().FirstOrDefault(x => x.Team.Abbreviation == item.Value.TrimEnd().ToUpperInvariant()).Team.Id;
+                        favTeamId = result.Sports.First().Leagues.Select(x => x.Teams).First().FirstOrDefault(x => x.Team.Abbreviation == item.Value.Trim().ToUpperInvariant()).Team.Id;
 
                         var response2 = await _httpClient.GetAsync($"{url}/{favTeamId}/schedule");
                         if (response2.IsSuccessStatusCode)
@@ -95,7 +110,7 @@ namespace TeamVacationPlanner.EspnApi
                             var result2 = JsonConvert.DeserializeObject<ESPNApiResponse2>(json2);
                             var filtered = result2.Events.Where(x => x.Date > currentDate && x.Competitions.First().Competitors.FirstOrDefault(x => x.Id == favTeamId).HomeAway == "away").ToList();
 
-                            if (item.Key.ToUpperInvariant().TrimEnd() == "MLS" && item.Value.ToUpperInvariant().TrimEnd() == "MIN")
+                            if (item.Key.ToUpperInvariant().Trim() == "MLS" && item.Value.ToUpperInvariant().Trim() == "MIN")
                             {
                                 foreach (var hardcodeEvent in _hardcodedEvents)
                                 {
@@ -130,20 +145,23 @@ namespace TeamVacationPlanner.EspnApi
                         var eventDateRange = Math.Abs((eventB.Date - eventA.Date).Days);
                         if (eventDateRange <= numberOfDays /*&& eventDateRange >= 0 && eventA.date >= currentDate && eventB.date >= currentDate*/)
                         {
-                            var locationA = venueA.Address.StateName ?? venueA.Address.City.Split(',').Last().TrimStart();
-                            var locationB = venueB.Address.StateName ?? venueB.Address.City.Split(',').Last().TrimStart();
+                            var locationA = venueA.Address.StateName ?? venueA.Address.City.Split(',').Last().Trim();
+                            var locationB = venueB.Address.StateName ?? venueB.Address.City.Split(',').Last().Trim();
 
                             // Compare the venues of the two events
                             if (venueA.FullName != venueB.FullName && locationA == locationB)
                             {
+                                var distance = await GetDistanceBetweenAddressesAsync($"{venueA.FullName} {venueA.AddressName}", $"{venueB.FullName} {venueB.AddressName}");
+
                                 items.Add(new SportsEvent
                                 {
                                     CompetitionA = eventA.Name,
                                     CompetitionB = eventB.Name,
-                                    LocationA = $"{venueA.FullName}, {venueA.Address.City}, {venueA.Address.StateName}, {venueA.Address.ZipCode}",
-                                    LocationB = $"{venueB.FullName}, {venueB.Address.City}, {venueB.Address.StateName}, {venueB.Address.ZipCode}",
+                                    LocationA = $"{venueA.FullName}, {venueA.AddressName}",
+                                    LocationB = $"{venueB.FullName}, {venueB.AddressName}",
                                     DateTimeA = eventA.Date,
-                                    DateTimeB = eventB.Date
+                                    DateTimeB = eventB.Date,
+                                    Distance = distance
                                 });
 
                                 eventsWithDifferentVenues.Add((eventB, eventA));
@@ -168,6 +186,67 @@ namespace TeamVacationPlanner.EspnApi
 
                 return (new List<SportsEvent>(), errorMessage);
             }
+
+
+        }
+
+        private async Task<double> GetDistanceBetweenAddressesAsync(string address1, string address2)
+        {
+            if (!string.IsNullOrWhiteSpace(_apiKey))
+            {
+                using var httpClient = new HttpClient();
+                var geocodeUrl = $"http://dev.virtualearth.net/REST/v1/Locations/";
+                var routeUrl = $"http://dev.virtualearth.net/REST/v1/Routes/";
+
+                // Step 1: Get latitude and longitude for address1
+                HttpResponseMessage response = await httpClient.GetAsync($"{geocodeUrl}{Uri.EscapeDataString(address1)}?key={_apiKey}");
+                response.EnsureSuccessStatusCode();
+                var json = await response.Content.ReadAsStringAsync();
+                var lat1 = ParseLatitude(json);
+                var lng1 = ParseLongitude(json);
+
+                // Step 2: Get latitude and longitude for address2
+                response = await httpClient.GetAsync($"{geocodeUrl}{Uri.EscapeDataString(address2)}?key={_apiKey}");
+                response.EnsureSuccessStatusCode();
+                var json2 = await response.Content.ReadAsStringAsync();
+                var lat2 = ParseLatitude(json2);
+                var lng2 = ParseLongitude(json2);
+
+                // Step 3: Calculate distance using Haversine formula (you can use other formulas as well)
+                var earthRadius = 3959; // Earth's radius in miles
+                var dLat = DegreeToRadian(lat2 - lat1);
+                var dLng = DegreeToRadian(lng2 - lng1);
+                var a = Math.Sin(dLat / 2) * Math.Sin(dLat / 2) +
+                           Math.Cos(DegreeToRadian(lat1)) * Math.Cos(DegreeToRadian(lat2)) *
+                           Math.Sin(dLng / 2) * Math.Sin(dLng / 2);
+                var c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
+                var distance = earthRadius * c;
+
+                return Math.Round(distance, 2);
+            }
+
+            return 0;
+        }
+
+        private double ParseLatitude(string json)
+        {
+            dynamic data = JsonConvert.DeserializeObject(json);
+            // Implement logic to parse latitude from the JSON response
+            // Example: return latitude from the JSON response
+            return data.resourceSets[0].resources[0].geocodePoints[0].coordinates[0];
+        }
+
+        private double ParseLongitude(string json)
+        {
+            dynamic data = JsonConvert.DeserializeObject(json);
+            // Implement logic to parse longitude from the JSON response
+            // Example: return longitude from the JSON response
+            return data.resourceSets[0].resources[0].geocodePoints[0].coordinates[1];
+        }
+
+        private double DegreeToRadian(double degree)
+        {
+            return degree * Math.PI / 180;
         }
     }
 }

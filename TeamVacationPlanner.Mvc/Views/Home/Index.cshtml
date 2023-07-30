@@ -79,6 +79,7 @@
             <th>Location B</th>
             <th>Date A</th>
             <th>Date B</th>
+            <th>Approx Distance</th>
         </tr>
         @foreach (var item in Model.Events)
         {
@@ -89,6 +90,7 @@
                 <td>@item.LocationB</td>
                 <td>@item.DateTimeA</td>
                 <td>@item.DateTimeB</td>
+                <td>@item.Distance</td>
             </tr>
         }
     </table>

@@ -12,7 +12,7 @@ public class Program
         var invalidMessage = "Invalid input. Please ";
         var numberOfDaysMessage = "Enter number of days to query by:";
         var favoriteTeamsMessage = "Enter league-team abbreviation to list favorite teams in format 'NFL=MIN'. Enter 'done' to finish:";
-        var seperator = "---------------------------------------------------------------------------------------";
+        var seperator = "--------------------------------------------------------------------------------------------------";
 
         // Prompt the user for input
         Console.WriteLine(numberOfDaysMessage);
@@ -92,7 +92,7 @@ public class Program
             Console.WriteLine();
             Console.WriteLine($"Count returned from query: {Events.Count}");
             Console.WriteLine(seperator);
-            Console.WriteLine("| Competition A | Competition B | Location A | Location B | Timestamp A | Timestamp B |");
+            Console.WriteLine("| Competition A | Competition B | Location A | Location B | Timestamp A | Timestamp B | Distance |");
             Console.WriteLine(seperator);
 
             // Display each SportsEvent row in the table

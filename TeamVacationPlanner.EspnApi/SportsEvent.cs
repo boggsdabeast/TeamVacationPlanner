@@ -11,11 +11,12 @@ namespace TeamVacationPlanner.EspnApi
         public string LocationB { get; set; }
         public DateTime DateTimeA { get; set; }
         public DateTime DateTimeB { get; set; }
+        public double Distance { get; set; }
         public string Row
         {
             get
             {
-                return $"| {CompetitionA,-13} | {CompetitionB,-13} | {LocationA,-10} | {LocationB,-10} | {DateTimeA.ToShortDateString(),-8} | {DateTimeB.ToShortDateString(),-8} |";
+                return $"| {CompetitionA} | {CompetitionB} | {LocationA} | {LocationB} | {DateTimeA.ToShortDateString()} | {DateTimeB.ToShortDateString()} | {Distance} |";
             }
         }
     }
@@ -224,7 +225,7 @@ namespace TeamVacationPlanner.EspnApi
         {
             get
             {
-                switch (State?.ToUpperInvariant() ?? City?.Split(',')?.Last()?.TrimStart().ToUpperInvariant())
+                switch (State?.ToUpperInvariant() ?? City?.Split(',')?.Last()?.Trim().ToUpperInvariant())
                 {
                     case "ALABAMA":
                         return "AL";
@@ -355,6 +356,7 @@ namespace TeamVacationPlanner.EspnApi
     {
         public string FullName { get; set; }
         public Address Address { get; set; }
+        public string AddressName { get { return $"{Address?.City} {Address?.StateName} {Address?.ZipCode}".Trim(); } }
     }
 
     public class Type

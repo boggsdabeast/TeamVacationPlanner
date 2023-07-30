@@ -362,3 +362,5 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 /TeamVacationPlanner.Mvc/Properties/ServiceDependencies/TeamVacationPlanner - Web Deploy/profile.arm.json
+/TeamVacationPlanner.Console/appsettings.json
+/TeamVacationPlanner.Mvc/appsettings.json
