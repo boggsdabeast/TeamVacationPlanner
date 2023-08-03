@@ -45,3 +45,7 @@ th {
     /*flex: 1;*/
     margin-right: 10px;
 }
+
+.input {
+    width: 60px;
+}

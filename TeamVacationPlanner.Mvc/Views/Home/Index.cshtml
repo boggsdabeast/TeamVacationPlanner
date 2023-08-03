@@ -16,10 +16,13 @@
         </select>
 
         <label class="right-padding" for="numberOfDays"># of days:</label>
-        <input class="right-padding" type="number" id="numberOfDays" name="numberOfDays" asp-for="NumberOfDays" />
+        <input class="right-padding input" type="number" id="numberOfDays" name="numberOfDays" asp-for="NumberOfDays" />
 
-        <label class="right-padding" for="favoriteTeam">Enter favorite teams abbreviation (ex: MIN):</label>
-        <input class="right-padding" type="text" id="favoriteTeam" name="FavoriteTeam" asp-for="FavoriteTeam" />
+        <label class="right-padding" for="distance">Distance of stadiums:</label>
+        <input class="right-padding input" type="number" id="distance" name="distance" asp-for="Distance" />
+
+        <label class="right-padding" for="favoriteTeam">Enter favorite teams abbreviation:</label>
+        <input class="right-padding input" type="text" id="favoriteTeam" name="FavoriteTeam" asp-for="FavoriteTeam" placeholder="MIN" />
 
         <input class="right-padding" type="submit" value="Add" />
 
@@ -46,7 +49,7 @@
 
     if (Model.Events.Count == 0 && !Model.Errors.Any())
     {
-        <h1 style="text-decoration: underline; color: yellow; background-color: black; padding: 10px; text-align: center">It is reccomended to add additional sports</h1>
+        <h1 style="text-decoration: underline; background-color: yellow; padding: 10px; text-align: center">It is reccomended to add additional sports</h1>
         <br />
     }
 

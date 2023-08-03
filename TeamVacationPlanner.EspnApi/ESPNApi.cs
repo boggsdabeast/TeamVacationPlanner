@@ -10,7 +10,9 @@ namespace TeamVacationPlanner.EspnApi
         private const string ApiBaseUrl = "https://site.api.espn.com/apis/site/v2/sports";
         private readonly HttpClient _httpClient;
         private readonly List<Event> _hardcodedEvents = new();
-        private string _apiKey;
+        private readonly string _apiKey;
+        private readonly double _nullDistance = -1;
+        private readonly Dictionary<string, double> _addressDistance = new();
 
         public ESPNApi()
         {
@@ -59,17 +61,17 @@ namespace TeamVacationPlanner.EspnApi
             .Build();
 
             var configuration = host.Services.GetRequiredService<IConfiguration>();
-
-            _apiKey = configuration["ApiKeys:BingMaps"];
+            if (configuration != null)
+                _apiKey = configuration["ApiKeys:BingMaps"];
         }
 
-        public async Task<(List<SportsEvent> Events, List<string> Errors)> GetOverlappingEvents(int numberOfDays, Dictionary<string, string> favoriteTeams)
+        public async Task<(List<SportsEvent> Events, List<string> Errors)> GetOverlappingEvents(int numberOfDays, int searchDistance, Dictionary<string, string> favoriteTeams)
         {
             try
             {
                 var favTeamId = 0;
                 var url = ApiBaseUrl;
-                var currentDate = DateTime.Now;
+                var currentDate = DateTime.UtcNow.Date;
                 var events = new List<Event>();
                 var items = new List<SportsEvent>();
 
@@ -108,7 +110,7 @@ namespace TeamVacationPlanner.EspnApi
                         {
                             var json2 = await response2.Content.ReadAsStringAsync();
                             var result2 = JsonConvert.DeserializeObject<ESPNApiResponse2>(json2);
-                            var filtered = result2.Events.Where(x => x.Date > currentDate && x.Competitions.First().Competitors.FirstOrDefault(x => x.Id == favTeamId).HomeAway == "away").ToList();
+                            var filtered = result2.Events.Where(x => x.Date > currentDate && x.Competitions.First().Competitors.FirstOrDefault(x => x.Id == favTeamId).HomeAway.ToLower().Trim() == "away").ToList();
 
                             if (item.Key.ToUpperInvariant().Trim() == "MLS" && item.Value.ToUpperInvariant().Trim() == "MIN")
                             {
@@ -143,22 +145,32 @@ namespace TeamVacationPlanner.EspnApi
 
                         // Check if both events are within the rangeInDays
                         var eventDateRange = Math.Abs((eventB.Date - eventA.Date).Days);
-                        if (eventDateRange <= numberOfDays /*&& eventDateRange >= 0 && eventA.date >= currentDate && eventB.date >= currentDate*/)
+                        if (eventDateRange <= numberOfDays)
                         {
                             var locationA = venueA.Address.StateName ?? venueA.Address.City.Split(',').Last().Trim();
                             var locationB = venueB.Address.StateName ?? venueB.Address.City.Split(',').Last().Trim();
 
-                            // Compare the venues of the two events
-                            if (venueA.FullName != venueB.FullName && locationA == locationB)
+                            var distance = _nullDistance;
+                            var key = $"{eventA.Name} - {eventB.Name}";
+                            if (_addressDistance.TryGetValue(key, out var distanceApart))
                             {
-                                var distance = await GetDistanceBetweenAddressesAsync($"{venueA.FullName} {venueA.AddressName}", $"{venueB.FullName} {venueB.AddressName}");
+                                distance = distanceApart;
+                            }
+                            else
+                            {
+                                distance = await GetDistanceBetweenAddressesAsync($"{venueA.FullName} {venueA.AddressName}", $"{venueB.FullName} {venueB.AddressName}");
+                                _addressDistance.Add(key, distance);
+                            }
 
+                            // Compare the venues of the two events
+                            if (venueA.FullName != venueB.FullName && (locationA == locationB || distance <= searchDistance))
+                            {
                                 items.Add(new SportsEvent
                                 {
                                     CompetitionA = eventA.Name,
                                     CompetitionB = eventB.Name,
-                                    LocationA = $"{venueA.FullName}, {venueA.AddressName}",
-                                    LocationB = $"{venueB.FullName}, {venueB.AddressName}",
+                                    LocationA = $"{venueA.AddressName} ({venueA.FullName})",
+                                    LocationB = $"{venueB.AddressName} ({venueB.FullName})",
                                     DateTimeA = eventA.Date,
                                     DateTimeB = eventB.Date,
                                     Distance = distance
@@ -186,8 +198,6 @@ namespace TeamVacationPlanner.EspnApi
 
                 return (new List<SportsEvent>(), errorMessage);
             }
-
-
         }
 
         private async Task<double> GetDistanceBetweenAddressesAsync(string address1, string address2)
@@ -225,7 +235,7 @@ namespace TeamVacationPlanner.EspnApi
                 return Math.Round(distance, 2);
             }
 
-            return 0;
+            return _nullDistance;
         }
 
         private double ParseLatitude(string json)

@@ -5,6 +5,7 @@ namespace TeamVacationPlanner.Mvc.Models
     public class FavoriteTeamModelBase
     {
         public int NumberOfDays { get; set; } = 7;
+        public int Distance { get; set; } = 100;
         public Dictionary<string, string> FavoriteTeams { get; set; } = new();
     }
 

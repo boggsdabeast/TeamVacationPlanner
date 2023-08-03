@@ -35,12 +35,13 @@ namespace TeamVacationPlanner.Mvc.Controllers
             {
                 Sports = _sports,
                 NumberOfDays = data.NumberOfDays,
+                Distance = data.Distance,
                 FavoriteTeams = data.FavoriteTeams
             };
 
             if (model.FavoriteTeams.Any())
             {
-                var (Events, Errors) = await _espnApi.GetOverlappingEvents(model.NumberOfDays, model.FavoriteTeams);
+                var (Events, Errors) = await _espnApi.GetOverlappingEvents(model.NumberOfDays, model.Distance, model.FavoriteTeams);
                 if (Errors.Any())
                 {
                     model.Errors = Errors;
@@ -61,6 +62,7 @@ namespace TeamVacationPlanner.Mvc.Controllers
                 SaveFavoriteTeamsToSession(new FavoriteTeamModelBase()
                 {
                     NumberOfDays = model.NumberOfDays,
+                    Distance = model.Distance,
                     FavoriteTeams = new Dictionary<string, string>
                     {
                         { "NFL", "DEN" },
@@ -82,9 +84,14 @@ namespace TeamVacationPlanner.Mvc.Controllers
                     data.NumberOfDays = model.NumberOfDays;
                     hasChanges = true;
                 }
+                if (data.Distance != model.Distance)
+                {
+                    data.Distance = model.Distance;
+                    hasChanges = true;
+                }
                 if (!data.FavoriteTeams.ContainsKey(model.SelectedSportId) || !data.FavoriteTeams.ContainsValue(model.FavoriteTeam))
                 {
-                    data.FavoriteTeams[model.SelectedSportId] = model.FavoriteTeam;
+                    data.FavoriteTeams[model.SelectedSportId] = model.FavoriteTeam.ToUpperInvariant().Trim();
                     hasChanges = true;
                 }
 
