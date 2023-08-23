@@ -16,38 +16,39 @@ namespace TeamVacationPlanner.EspnApi
 
         public ESPNApi()
         {
+            var id = 1;
             _httpClient = new HttpClient();
             _hardcodedEvents.Add(new Event()
             {
-                Id = 1,
+                Id = id++,
                 Date = new DateTime(2023, 8, 20),
                 Name = "MNUFC @ NYC",
                 Competitions = new List<Competition> { new Competition() { Venue = new Venue() { FullName = "Citi Field", Address = new Address() { State = "NY" } } } }
             });
             _hardcodedEvents.Add(new Event()
             {
-                Id = 2,
+                Id = id++,
                 Date = new DateTime(2023, 9, 2),
                 Name = "MNUFC @ San Jose",
                 Competitions = new List<Competition> { new Competition() { Venue = new Venue() { FullName = "PayPal Park", Address = new Address() { State = "CA" } } } }
             });
             _hardcodedEvents.Add(new Event()
             {
-                Id = 3,
+                Id = id++,
                 Date = new DateTime(2023, 9, 20),
                 Name = "MNUFC @ LA",
                 Competitions = new List<Competition> { new Competition() { Venue = new Venue() { FullName = "Dignity Health Sports Park", Address = new Address() { State = "CA" } } } }
             });
             _hardcodedEvents.Add(new Event()
             {
-                Id = 4,
+                Id = id++,
                 Date = new DateTime(2023, 10, 4),
                 Name = "MNUFC @ LAFC",
                 Competitions = new List<Competition> { new Competition() { Venue = new Venue() { FullName = "BMO Stadium", Address = new Address() { State = "CA" } } } }
             });
             _hardcodedEvents.Add(new Event()
             {
-                Id = 5,
+                Id = id++,
                 Date = new DateTime(2023, 10, 21),
                 Name = "MNUFC @ KC",
                 Competitions = new List<Competition> { new Competition() { Venue = new Venue() { FullName = "Children's Mercy Park", Address = new Address() { State = "KC" } } } }
@@ -112,7 +113,26 @@ namespace TeamVacationPlanner.EspnApi
                             var result2 = JsonConvert.DeserializeObject<ESPNApiResponse2>(json2);
                             var filtered = result2.Events.Where(x => x.Date > currentDate && x.Competitions.First().Competitors.FirstOrDefault(x => x.Id == favTeamId).HomeAway.ToLower().Trim() == "away").ToList();
 
-                            if (item.Key.ToUpperInvariant().Trim() == "MLS" && item.Value.ToUpperInvariant().Trim() == "MIN")
+                            if (item.Key.ToUpperInvariant().Trim() == "NFL" && result2.Season.Name.ToLowerInvariant().Trim() == "preseason")
+                            {
+                                for (int i = 1; i < 19; i++)
+                                {
+                                    for (int j = DateTime.Now.Year - 1; j < DateTime.Now.Year + 1; j++)
+                                    {
+                                        var weeklyUrl = $"{ApiBaseUrl}/football/nfl/scoreboard?seasontype=2&week={i}&dates={j}";
+                                        var weeklyResponse = await _httpClient.GetAsync(weeklyUrl);
+                                        if (weeklyResponse.IsSuccessStatusCode)
+                                        {
+                                            var weeklyJson = await weeklyResponse.Content.ReadAsStringAsync();
+                                            var weeklyResult = JsonConvert.DeserializeObject<ESPNApiResponse2>(weeklyJson);
+                                            var weeklyCompetition = weeklyResult.Events.FirstOrDefault(x => x.Competition.Competitors.Any(y => y.HomeAway.ToLowerInvariant().Trim() == "away" && y.Team.Abbreviation.ToUpperInvariant().Trim() == item.Value.ToUpperInvariant().Trim()));
+                                            if (weeklyCompetition?.Date > currentDate)
+                                                filtered.Add(weeklyCompetition);
+                                        }
+                                    }
+                                }
+                            }
+                            else if (item.Key.ToUpperInvariant().Trim() == "MLS" && item.Value.ToUpperInvariant().Trim() == "MIN")
                             {
                                 foreach (var hardcodeEvent in _hardcodedEvents)
                                 {
