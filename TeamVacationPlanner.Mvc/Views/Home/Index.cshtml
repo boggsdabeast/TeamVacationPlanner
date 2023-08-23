@@ -3,6 +3,19 @@
     ViewData["Title"] = "Home page";
 }
 
+<script>
+    function myFunction() {
+        var x = document.getElementById("add");
+        if (x.style.display === "none") {
+            x.style.display = "block";
+        } else {
+            x.style.display = "none";
+        }
+
+        document.getElementById('loading').style.display = "block";
+    }
+</script>
+
 <h2>Select Teams</h2>
 <form method="post">
     <div class="form-container">
@@ -24,7 +37,8 @@
         <label class="right-padding" for="favoriteTeam">Enter favorite teams abbreviation:</label>
         <input class="right-padding input" type="text" id="favoriteTeam" name="FavoriteTeam" asp-for="FavoriteTeam" placeholder="MIN" />
 
-        <input class="right-padding" type="submit" value="Add" />
+        <input class="right-padding" id="add" type="submit" value="Add" onclick="myFunction()" />
+        <label class="right-padding" id="loading" style="display:none;">loading...</label>
 
         @if (Model.FavoriteTeams.Any() && !Model.Errors.Any())
         {
