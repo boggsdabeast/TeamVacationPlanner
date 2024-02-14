@@ -21,38 +21,122 @@ namespace TeamVacationPlanner.EspnApi
             _hardcodedEvents.Add(new Event()
             {
                 Id = id++,
-                Date = new DateTime(2023, 8, 20),
-                Name = "MNUFC @ NYC",
-                Competitions = new List<Competition> { new Competition() { Venue = new Venue() { FullName = "Citi Field", Address = new Address() { State = "NY" } } } }
+                Date = new DateTime(2023, 2, 24),
+                Name = "MNUFC @ Austin",
+                Competitions = new List<Competition> { new Competition() { Venue = new Venue() { FullName = "Q2 Stadium", Address = new Address() { State = "TX" } } } }
             });
             _hardcodedEvents.Add(new Event()
             {
                 Id = id++,
-                Date = new DateTime(2023, 9, 2),
+                Date = new DateTime(2023, 3, 9),
+                Name = "MNUFC @ Orlando",
+                Competitions = new List<Competition> { new Competition() { Venue = new Venue() { FullName = "INTER CO Stadium", Address = new Address() { State = "FL" } } } }
+            });
+            _hardcodedEvents.Add(new Event()
+            {
+                Id = id++,
+                Date = new DateTime(2023, 3, 30),
+                Name = "MNUFC @ Phili",
+                Competitions = new List<Competition> { new Competition() { Venue = new Venue() { FullName = "Subaru Park", Address = new Address() { State = "PA" } } } }
+            });
+            _hardcodedEvents.Add(new Event()
+            {
+                Id = id++,
+                Date = new DateTime(2023, 4, 21),
+                Name = "MNUFC @ Charlotte",
+                Competitions = new List<Competition> { new Competition() { Venue = new Venue() { FullName = "Bank of America Stadium", Address = new Address() { State = "NC" } } } }
+            });
+            _hardcodedEvents.Add(new Event()
+            {
+                Id = id++,
+                Date = new DateTime(2023, 5, 4),
+                Name = "MNUFC @ Atlanta",
+                Competitions = new List<Competition> { new Competition() { Venue = new Venue() { FullName = "Mercedes-Benz Stadium", Address = new Address() { State = "GA" } } } }
+            });
+            _hardcodedEvents.Add(new Event()
+            {
+                Id = id++,
+                Date = new DateTime(2023, 5, 25),
+                Name = "MNUFC @ Colorado",
+                Competitions = new List<Competition> { new Competition() { Venue = new Venue() { FullName = "Dicks Sporting Goods Stadium", Address = new Address() { State = "CO" } } } }
+            });
+            _hardcodedEvents.Add(new Event()
+            {
+                Id = id++,
+                Date = new DateTime(2023, 5, 29),
+                Name = "MNUFC @ LAFC",
+                Competitions = new List<Competition> { new Competition() { Venue = new Venue() { FullName = "BMO Stadium", Address = new Address() { State = "LA" } } } }
+            });
+            _hardcodedEvents.Add(new Event()
+            {
+                Id = id++,
+                Date = new DateTime(2023, 6, 15),
+                Name = "MNUFC @ Seattle",
+                Competitions = new List<Competition> { new Competition() { Venue = new Venue() { FullName = "Lumen Field", Address = new Address() { State = "WA" } } } }
+            });
+            _hardcodedEvents.Add(new Event()
+            {
+                Id = id++,
+                Date = new DateTime(2023, 6, 19),
+                Name = "MNUFC @ Dallas",
+                Competitions = new List<Competition> { new Competition() { Venue = new Venue() { FullName = "Toyota Stadium", Address = new Address() { State = "TX" } } } }
+            });
+            _hardcodedEvents.Add(new Event()
+            {
+                Id = id++,
+                Date = new DateTime(2023, 6, 29),
+                Name = "MNUFC @ Portland",
+                Competitions = new List<Competition> { new Competition() { Venue = new Venue() { FullName = "Providence Park", Address = new Address() { State = "OR" } } } }
+            });
+            _hardcodedEvents.Add(new Event()
+            {
+                Id = id++,
+                Date = new DateTime(2023, 7, 7),
+                Name = "MNUFC @ LA",
+                Competitions = new List<Competition> { new Competition() { Venue = new Venue() { FullName = "Dignity Health Sports Park", Address = new Address() { State = "LA" } } } }
+            });
+            _hardcodedEvents.Add(new Event()
+            {
+                Id = id++,
+                Date = new DateTime(2023, 7, 13),
+                Name = "MNUFC @ Houston",
+                Competitions = new List<Competition> { new Competition() { Venue = new Venue() { FullName = "Shell Energy Stadium", Address = new Address() { State = "TX" } } } }
+            });
+            _hardcodedEvents.Add(new Event()
+            {
+                Id = id++,
+                Date = new DateTime(2023, 8, 31),
                 Name = "MNUFC @ San Jose",
                 Competitions = new List<Competition> { new Competition() { Venue = new Venue() { FullName = "PayPal Park", Address = new Address() { State = "CA" } } } }
             });
             _hardcodedEvents.Add(new Event()
             {
                 Id = id++,
-                Date = new DateTime(2023, 9, 20),
-                Name = "MNUFC @ LA",
-                Competitions = new List<Competition> { new Competition() { Venue = new Venue() { FullName = "Dignity Health Sports Park", Address = new Address() { State = "CA" } } } }
+                Date = new DateTime(2023, 9, 14),
+                Name = "MNUFC @ St Louis",
+                Competitions = new List<Competition> { new Competition() { Venue = new Venue() { FullName = "CITYPARK", Address = new Address() { State = "MO" } } } }
             });
             _hardcodedEvents.Add(new Event()
             {
                 Id = id++,
-                Date = new DateTime(2023, 10, 4),
-                Name = "MNUFC @ LAFC",
-                Competitions = new List<Competition> { new Competition() { Venue = new Venue() { FullName = "BMO Stadium", Address = new Address() { State = "CA" } } } }
+                Date = new DateTime(2023, 9, 21),
+                Name = "MNUFC @ KC",
+                Competitions = new List<Competition> { new Competition() { Venue = new Venue() { FullName = "Children's Mercy Park", Address = new Address() { State = "KC" } } } }
             });
             _hardcodedEvents.Add(new Event()
             {
                 Id = id++,
                 Date = new DateTime(2023, 10, 21),
-                Name = "MNUFC @ KC",
-                Competitions = new List<Competition> { new Competition() { Venue = new Venue() { FullName = "Children's Mercy Park", Address = new Address() { State = "KC" } } } }
+                Name = "MNUFC @ Salt Lake",
+                Competitions = new List<Competition> { new Competition() { Venue = new Venue() { FullName = "America First Field", Address = new Address() { State = "UT" } } } }
             });
+            //_hardcodedEvents.Add(new Event()
+            //{
+            //    Id = id++,
+            //    Date = new DateTime(2023, 10, 5),
+            //    Name = "MNUFC @ Vancouver",
+            //    Competitions = new List<Competition> { new Competition() { Venue = new Venue() { FullName = "BC Place", Address = new Address() { State = "Vancouver" } } } }
+            //});
 
             var host = new HostBuilder()
             .ConfigureAppConfiguration((hostContext, config) =>
@@ -125,7 +209,7 @@ namespace TeamVacationPlanner.EspnApi
                                         {
                                             var weeklyJson = await weeklyResponse.Content.ReadAsStringAsync();
                                             var weeklyResult = JsonConvert.DeserializeObject<ESPNApiResponse2>(weeklyJson);
-                                            var weeklyCompetition = weeklyResult.Events.FirstOrDefault(x => x.Competition.Competitors.Any(y => y.HomeAway.ToLowerInvariant().Trim() == "away" && y.Team.Abbreviation.ToUpperInvariant().Trim() == item.Value.ToUpperInvariant().Trim()));
+                                            var weeklyCompetition = weeklyResult.Events.FirstOrDefault(x => x.Competition.Competitors.Any(y => /*y.HomeAway.ToLowerInvariant().Trim() == "away" && */y.Team.Abbreviation.ToUpperInvariant().Trim() == item.Value.ToUpperInvariant().Trim()));
                                             if (weeklyCompetition?.Date > currentDate)
                                                 filtered.Add(weeklyCompetition);
                                         }
