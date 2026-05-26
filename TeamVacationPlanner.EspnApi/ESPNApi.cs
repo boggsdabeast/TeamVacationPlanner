@@ -300,7 +300,7 @@ namespace TeamVacationPlanner.EspnApi
                 }
 
                 return (items.Distinct().OrderBy(x => x.DateTimeA).ToList(), new List<string>());
-        }
+            }
             catch (Exception ex)
             {
                 var errorMessage = new List<string>() { "Please re-enter data in proper format to get valid results." };
@@ -315,14 +315,14 @@ namespace TeamVacationPlanner.EspnApi
 
                 return (new List<SportsEvent>(), errorMessage);
             }
-}
+        }
 
         private async Task<double> GetDistanceBetweenAddressesAsync(string address1, string address2)
         {
             if (!string.IsNullOrWhiteSpace(_apiKey))
             {
                 using var httpClient = new HttpClient();
-                
+
                 // Step 1: Get latitude and longitude for address1
                 var response = await httpClient.GetAsync($"{_geocodeUrl}{_apiKey}&query={Uri.EscapeDataString(address1)}");
                 response.EnsureSuccessStatusCode();
